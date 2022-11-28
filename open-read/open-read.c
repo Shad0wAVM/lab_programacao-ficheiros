@@ -22,26 +22,32 @@ int main(int argc, char *argv[])
     * - O_RDONLY: open the file for reading
     *
     */
-   int fd = open("test.txt", O_RDONLY);
-   if (fd < 0){
+   FILE *file = fopen("test.txt", "r");
+   if (!file){
       fprintf(stderr, "open error: %s\n", strerror(errno));
       return -1;
    }
 
    char buffer[128];
    memset(buffer,0,sizeof(buffer));
+   size_t test = fread(&buffer, sizeof(char), 127, file);
+   while (test!= 0){
 
-   /* read the contents of the file */
-   int bytes_read = read(fd, buffer, sizeof(buffer));
-   if (bytes_read < 0){
-      fprintf(stderr, "read error: %s\n", strerror(errno));
-      return -1;
+      printf("%s",buffer);
+
+      memset(buffer,0,sizeof(buffer));
+
+      /* read the contents of the file */
+      test = fread(&buffer, sizeof(char), 127, file);
+      if (test < 0){
+         fprintf(stderr, "read error: %s\n", strerror(errno));
+         return -1;
+      }
+
+      
    }
-
-   printf("%s",buffer);
-
    /* close the file */
-   close(fd);
+   fclose(file);
 
    return 0;
 }
